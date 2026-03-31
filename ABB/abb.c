@@ -41,3 +41,27 @@ int altura(Abb *a){
     int tamDir = altura(a->dir);
     return tamEsq > tamDir ? tamEsq + 1 : tamDir + 1;
 }
+
+void rec_preorder(Abb *t, void (*visit)(Abb*)){
+    if(t != NULL){
+        visit(t);
+        rec_preorder(t->esq, visit);
+        rec_preorder(t->dir, visit);
+    }
+}
+
+void rec_inorder(Abb *t, void (*visit)(Abb*)){
+    if(t != NULL){
+        rec_preorder(t->esq, visit);
+        visit(t);
+        rec_preorder(t->dir, visit);
+    }
+}
+
+void rec_postorder(Abb *t, void (*visit)(Abb*)){
+    if(t != NULL){
+        rec_preorder(t->esq, visit);
+        rec_preorder(t->dir, visit);
+        visit(t);
+    }
+}
