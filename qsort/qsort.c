@@ -1,5 +1,11 @@
 #include "item.h"
+#include <sys/time.h>
+#include <stdlib.h>
 #define CUTOFF 15
+
+// Definição das variáveis da pilha
+int stack[MAX_STACK];
+int topo = -1;
 
 int median_of_3(Item *a, int lo, int hi) {
     int mid = lo + (hi - lo)/2;
@@ -53,6 +59,56 @@ void quick_sort(Item *a, int lo, int hi){
     quick_sort(a, j+1, hi);
 }
 
+void quick_sort_bottom_up(Item *a, int lo, int hi){
+    stack_init();
+    push2(lo, hi);
+    while(!stack_empty()){
+        lo = pop(); hi = pop();
+        if(hi <= lo + CUTOFF - 1) {
+            insert_sort(a, lo, hi);
+            continue;
+        }
+        int median = median_of_3(a, lo, hi);
+        exch(a[lo], a[median]);
+        int i = partition(a, lo, hi);
+        if(i-lo > hi-i){
+            push2(lo, i-1);
+            push2(i+1, hi);
+        } else {
+            push2(i+1, hi);
+            push2(lo, i-1);
+        }
+    }
+}
+
+void shuffle(Item *a,int N){
+    struct timeval tv; gettimeofday(&tv,NULL);
+    srand48(tv.tv_usec);
+    for(int i=N-1;i>0;i--){
+        int j=(unsigned int)(drand48()*(i+1));
+        exch(a[i],a[j]);
+    }
+}
+
+void quick_sort_3_way(Item *a,int lo,int hi){
+    if(hi<=lo) return;
+    Item v=a[lo];
+    int lt=lo,gt=hi,i=lo;
+    while (i<=gt){
+        if (a[i]<v){
+            exch(a[lt],a[i]);
+            lt++;i++;
+        } else if (a[i]>v){
+            exch(a[i],a[gt]);
+            gt--;
+        } else{
+            i++;
+        }
+    }
+    quick_sort(a,lo,lt-1);
+    quick_sort(a,gt+1,hi);
+}
+
 void sort(Item *a, int lo, int hi){
-    quick_sort(a, lo, hi);
+    quick_sort_3_way(a, lo, hi);
 }
